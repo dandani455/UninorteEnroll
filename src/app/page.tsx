@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import WeekCalendar from "@/components/WeekCalendar";
 import ProjectionPanel from "@/components/ProjectionPanel";
 import { useSchedule } from "@/store/schedule";
@@ -22,6 +22,30 @@ export default function HomePage() {
   const user = useUser((s) => s.user);
   const setUser = useUser((s) => s.setUser);
   const signOut = useUser((s) => s.signOut);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  /** ---------- Cierra el menú al hacer clic fuera o con ESC ---------- */
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (
+        menuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+    function onEsc(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [menuOpen]);
 
   /** ---------- Carga de datos desde /public/data ---------- */
   useEffect(() => {
@@ -55,16 +79,13 @@ export default function HomePage() {
   /** ---------- Derivados: semestres/carreras ---------- */
   const SEMESTERS_AVAILABLE = useMemo(() => {
     const s = new Set<number>();
-
     for (const subj of subjects) {
-      // Validamos que el campo exista y sea número
       const v = (subj as { semester?: unknown }).semester;
       if (typeof v === "number") s.add(v);
     }
-
     return Array.from(s).sort((a, b) => a - b);
   }, [subjects]);
-  // Si después agregas "career" en subjects, cámbialo a derivado:
+
   const CAREERS_AVAILABLE = useMemo(() => ["Ingeniería de Sistemas"], []);
 
   /** ---------- UI helpers ---------- */
@@ -212,34 +233,40 @@ export default function HomePage() {
             <div className="brand__title">UNIVERSIDAD DEL NORTE</div>
           </div>
 
-          <div className="flex items-center gap-3 relative">
+          <div className="flex items-center gap-3">
             <button className="btn btn-green" onClick={() => setOpen(true)}>
               <span>📅</span> Mi proyección
             </button>
 
-            <button
-              className="text-xs text-gray-800"
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              {user.name.toUpperCase()} ▾
-            </button>
+            {/* Contenedor RELATIVO del menú */}
+            <div ref={menuRef} className="user-menu">
+              <button
+                className="user-trigger"
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+              >
+                {user.name.toUpperCase()} ▾
+              </button>
 
-            {menuOpen && (
-              <div className="absolute right-0 top-10 bg-white border rounded-md shadow p-2 text-sm">
-                <div className="px-3 py-1 text-gray-600">
-                  {user.career} · {user.semester}°
+              {menuOpen && (
+                <div role="menu" className="dropdown">
+                  <div className="dropdown__info">
+                    {user.career} · {user.semester}°
+                  </div>
+                  <button
+                    role="menuitem"
+                    className="dropdown__item"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      signOut();
+                    }}
+                  >
+                    Cerrar sesión
+                  </button>
                 </div>
-                <button
-                  className="w-full text-left px-3 py-1 hover:bg-gray-100 rounded"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    signOut();
-                  }}
-                >
-                  Cerrar sesión
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </header>
