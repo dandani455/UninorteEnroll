@@ -5,22 +5,61 @@ import { useMemo, useState } from "react";
 import { useSchedule } from "@/store/schedule";
 import GraphCard from "@/components/GraphCard";
 
+/* =========================================================
+   Helpers (tipados) 
+   ========================================================= */
+
+type TMoment = string | number | Date;
+
+const toMin = (x: TMoment): number => {
+  if (typeof x === "number") return x;
+  if (x instanceof Date) return x.getHours() * 60 + x.getMinutes();
+  const [h, m] = String(x).split(":").map(Number);
+  return h * 60 + (m || 0);
+};
+
+const fmtHm = (x: TMoment): string => {
+  const m = toMin(x);
+  const hh = Math.floor(m / 60)
+    .toString()
+    .padStart(2, "0");
+  const mm = (m % 60).toString().padStart(2, "0");
+  return `${hh}:${mm}`;
+};
+
+const overlap = (
+  a: { day: string; start: TMoment; end: TMoment },
+  b: { day: string; start: TMoment; end: TMoment }
+): boolean => {
+  if (a.day !== b.day) return false;
+  const sa = toMin(a.start);
+  const ea = toMin(a.end);
+  const sb = toMin(b.start);
+  const eb = toMin(b.end);
+  return sa < eb && sb < ea; // intersección abierta
+};
+
 type Row = (string | number | boolean)[];
 const toCsv = (rows: Row[]) =>
   rows
     .map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(","))
     .join("\n");
 
-export default function GraphPage() {
-  const { sections, graph, metrics, sectionByNrc } = useSchedule();
+/* =========================================================
+   Página
+   ========================================================= */
 
-  /* --------- base --------- */
+export default function GraphPage() {
+  const { sections, meetings, graph, metrics, sectionByNrc } = useSchedule();
+
+  /* ---------- vértices ordenados por grado ---------- */
   const vertices = useMemo(() => {
     return [...new Set(sections.map((s) => s.nrc))].sort(
       (a, b) => (graph.get(b)?.size ?? 0) - (graph.get(a)?.size ?? 0)
     );
   }, [sections, graph]);
 
+  /* ---------- lista de aristas únicas (u<v) ---------- */
   const edges = useMemo(() => {
     const seen = new Set<string>();
     const list: Array<[string, string]> = [];
@@ -36,7 +75,7 @@ export default function GraphPage() {
     return list.sort();
   }, [graph]);
 
-  /* --------- greedy coloring --------- */
+  /* ---------- coloración greedy (solo demostración) ---------- */
   const coloring = useMemo(() => {
     const order = [...vertices].sort(
       (a, b) => (graph.get(b)?.size ?? 0) - (graph.get(a)?.size ?? 0)
@@ -59,7 +98,82 @@ export default function GraphPage() {
     return max + 1;
   }, [coloring]);
 
-  /* --------- matriz (se calcula sólo si se muestra) --------- */
+  /* ---------- meetings indexados por NRC ---------- */
+  const meetingsByNrc = useMemo(() => {
+    const map = new Map<
+      string,
+      { day: string; start: TMoment; end: TMoment }[]
+    >();
+    for (const m of meetings) {
+      const arr = map.get(m.nrc) ?? [];
+      arr.push({ day: m.day, start: m.start, end: m.end });
+      map.set(m.nrc, arr);
+    }
+    return map;
+  }, [meetings]);
+
+  /* ---------- aristas con explicación (tipo + detalle) ---------- */
+  type EdgeRow = {
+    u: string;
+    v: string;
+    type: "Misma materia" | "Choque horario";
+    detail: string;
+  };
+
+  const edgesDetailed: EdgeRow[] = useMemo(() => {
+    const out: EdgeRow[] = [];
+
+    for (const [u, v] of edges) {
+      const su = sectionByNrc.get(u);
+      const sv = sectionByNrc.get(v);
+
+      const sameSubject =
+        su?.subjectCode && sv?.subjectCode && su.subjectCode === sv.subjectCode;
+
+      if (sameSubject) {
+        out.push({
+          u,
+          v,
+          type: "Misma materia",
+          detail: `${su!.subjectCode}`,
+        });
+        continue;
+      }
+
+      // Busca el primer choque horario para explicar
+      const mu = meetingsByNrc.get(u) ?? [];
+      const mv = meetingsByNrc.get(v) ?? [];
+      let detail = "";
+      outer: for (const a of mu) {
+        for (const b of mv) {
+          if (overlap(a, b)) {
+            detail = `${a.day} ${fmtHm(a.start)}–${fmtHm(a.end)} ∩ ${fmtHm(
+              b.start
+            )}–${fmtHm(b.end)}`;
+            break outer;
+          }
+        }
+      }
+
+      out.push({
+        u,
+        v,
+        type: "Choque horario",
+        detail: detail || "—",
+      });
+    }
+
+    // ordena: primero choques horarios, luego misma materia, y por (u,v)
+    out.sort((A, B) => {
+      if (A.type !== B.type) return A.type === "Choque horario" ? -1 : 1;
+      if (A.u !== B.u) return A.u.localeCompare(B.u);
+      return A.v.localeCompare(B.v);
+    });
+
+    return out;
+  }, [edges, sectionByNrc, meetingsByNrc]);
+
+  /* ---------- matriz (on demand) ---------- */
   const [showMatrix, setShowMatrix] = useState(false);
   const matrix = useMemo(() => {
     if (!showMatrix) return [] as number[][];
@@ -79,12 +193,12 @@ export default function GraphPage() {
     return m;
   }, [showMatrix, vertices, graph]);
 
-  /* --------- CSV --------- */
+  /* ---------- CSVs ---------- */
   const csvEdges = useMemo(() => {
-    const rows: Row[] = [["u", "v"]];
-    edges.forEach(([u, v]) => rows.push([u, v]));
+    const rows: Row[] = [["u", "v", "tipo", "detalle"]];
+    edgesDetailed.forEach((e) => rows.push([e.u, e.v, e.type, e.detail]));
     return toCsv(rows);
-  }, [edges]);
+  }, [edgesDetailed]);
 
   const csvAdj = useMemo(() => {
     if (!showMatrix) return "";
@@ -93,6 +207,9 @@ export default function GraphPage() {
     return toCsv([header, ...body]);
   }, [showMatrix, matrix, vertices]);
 
+  /* =========================================================
+     Render
+     ========================================================= */
   return (
     <div>
       {/* Topbar */}
@@ -109,7 +226,7 @@ export default function GraphPage() {
           </div>
           <div className="graph-toolbar">
             <a
-              download="edges.csv"
+              download="aristas.csv"
               href={`data:text/csv;charset=utf-8,${encodeURIComponent(
                 csvEdges
               )}`}
@@ -199,16 +316,16 @@ export default function GraphPage() {
           </div>
         </section>
 
-        {/* Grafo en su propio marco (debajo de Vértices, arriba de Matrices) */}
+        {/* Grafo en su propio marco */}
         <GraphCard
           title="Grafo (vista general)"
-          height={340}
+          height={360}
           vertices={vertices}
           edges={edges}
           coloring={coloring}
         />
 
-        {/* Aristas (debajo del grafo) */}
+        {/* Aristas (ahora con tipo y detalle) */}
         <section>
           <h2 className="section-title">Aristas (conflictos)</h2>
           <div className="table-card max-h-96">
@@ -217,18 +334,22 @@ export default function GraphPage() {
                 <tr>
                   <th className="font-mono">u</th>
                   <th className="font-mono">v</th>
+                  <th>Tipo</th>
+                  <th>Detalle</th>
                 </tr>
               </thead>
               <tbody>
-                {edges.map(([u, v]) => (
-                  <tr key={`${u}-${v}`}>
-                    <td className="font-mono">{u}</td>
-                    <td className="font-mono">{v}</td>
+                {edgesDetailed.map((e) => (
+                  <tr key={`${e.u}-${e.v}`}>
+                    <td className="font-mono">{e.u}</td>
+                    <td className="font-mono">{e.v}</td>
+                    <td>{e.type}</td>
+                    <td className="text-slate-600">{e.detail}</td>
                   </tr>
                 ))}
-                {edges.length === 0 && (
+                {edgesDetailed.length === 0 && (
                   <tr>
-                    <td className="text-slate-500" colSpan={2}>
+                    <td className="text-slate-500" colSpan={4}>
                       Sin conflictos.
                     </td>
                   </tr>
