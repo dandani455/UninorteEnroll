@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSchedule } from "@/store/schedule";
-import GraphNotStatic from "@/components/GraphNotStatic";
+import GraphCard from "@/components/GraphCard";
 
 type Row = (string | number | boolean)[];
 const toCsv = (rows: Row[]) =>
@@ -108,7 +108,6 @@ export default function GraphPage() {
             </div>
           </div>
           <div className="graph-toolbar">
-            {/* descarga aristas siempre disponible */}
             <a
               download="edges.csv"
               href={`data:text/csv;charset=utf-8,${encodeURIComponent(
@@ -120,7 +119,6 @@ export default function GraphPage() {
               ⬇️ Aristas CSV
             </a>
 
-            {/* el CSV de la matriz sólo si está visible */}
             {showMatrix && (
               <a
                 download="adjacency_matrix.csv"
@@ -143,16 +141,6 @@ export default function GraphPage() {
 
       {/* Contenido */}
       <main className="max-w-[1200px] mx-auto px-4 py-6 space-y-8">
-        {/* Grafo animado */}
-        <section className="graph-shell">
-          <GraphNotStatic
-            vertices={vertices}
-            edges={edges}
-            coloring={coloring}
-            height={340}
-          />
-        </section>
-
         {/* Métricas */}
         <section>
           <div className="metric-grid">
@@ -211,7 +199,16 @@ export default function GraphPage() {
           </div>
         </section>
 
-        {/* Aristas (debajo de Vértices) */}
+        {/* Grafo en su propio marco (debajo de Vértices, arriba de Matrices) */}
+        <GraphCard
+          title="Grafo (vista general)"
+          height={340}
+          vertices={vertices}
+          edges={edges}
+          coloring={coloring}
+        />
+
+        {/* Aristas (debajo del grafo) */}
         <section>
           <h2 className="section-title">Aristas (conflictos)</h2>
           <div className="table-card max-h-96">

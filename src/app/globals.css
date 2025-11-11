@@ -17,9 +17,9 @@
   --border: #e5e7eb;
   --ring: 0 0 0 3px rgba(37, 99, 235, 0.15);
 
-  --radii-sm: 0.375rem; /* 6px */
-  --radii-md: 0.5rem; /* 8px */
-  --radii-lg: 0.75rem; /* 12px */
+  --radii-sm: 0.375rem;
+  --radii-md: 0.5rem;
+  --radii-lg: 0.75rem;
 
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-2: 0 10px 15px rgba(0, 0, 0, 0.05);
@@ -65,7 +65,7 @@
   color: var(--text);
 }
 
-/* Botones base + variantes */
+/* Botones base + variantes mínimas usadas */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -74,14 +74,13 @@
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: background var(--speed-fast) ease, color var(--speed-fast) ease,
-    box-shadow var(--speed-fast) ease;
   outline: none;
+  transition: background var(--speed-fast), color var(--speed-fast),
+    box-shadow var(--speed-fast);
 }
 .btn:focus-visible {
   box-shadow: var(--ring);
 }
-
 .btn-green {
   background: var(--brand-green);
   color: #fff;
@@ -89,7 +88,6 @@
 .btn-green:hover {
   background: var(--brand-green-hover);
 }
-
 .btn-ghost {
   color: #1d4ed8;
 }
@@ -97,15 +95,13 @@
   color: #1e40af;
 }
 
-/* =================== Calendario =================== */
+/* =================== Calendario (home) =================== */
 .calendar-shell {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--radii-md);
   box-shadow: var(--shadow-1);
 }
-
-/* franjas de 1 hora (tu grid usa 30min=1.5rem => 1h=3rem) */
 .timetable-stripes {
   background-image: repeating-linear-gradient(
     to bottom,
@@ -128,13 +124,12 @@
 .hours-col > div {
   height: 1.5rem;
 } /* 30min */
-
 .halfhour-line {
   height: 1.5rem;
   border-bottom: 1px dashed #e5e7eb;
 }
 
-/* bloques */
+/* bloques del calendario */
 .block {
   position: absolute;
   left: 0.25rem;
@@ -174,19 +169,17 @@
   visibility: visible;
   pointer-events: auto;
 }
-
 .modal__backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(1px);
-  transition: opacity var(--speed-normal) ease;
+  transition: opacity var(--speed-normal);
   opacity: 0;
 }
 .modal--open .modal__backdrop {
   opacity: 1;
 }
-
 .modal__panel {
   position: absolute;
   right: 0;
@@ -201,21 +194,17 @@
   border-left: 1px solid var(--border);
   transform: translateX(100%);
   will-change: transform;
-  transition: transform var(--speed-normal) ease;
+  transition: transform var(--speed-normal);
 }
 .modal--open .modal__panel {
   transform: translateX(0);
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .modal__panel {
-    transition: none;
-  }
+  .modal__panel,
   .modal__backdrop {
     transition: none;
   }
 }
-
 .modal__head {
   height: 3.5rem;
   padding: 0 1rem;
@@ -234,6 +223,7 @@
   overscroll-behavior: contain;
 }
 
+/* Tarjetas simples reutilizables */
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radii-md);
@@ -241,13 +231,16 @@
   margin-bottom: 0.75rem;
   background: #fff;
 }
+
+/* Lista/ítems (slide y paneles) */
 .item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   border-bottom: 1px solid #f3f4f6;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
+  position: relative;
 }
 .item:last-child {
   border-bottom: none;
@@ -261,129 +254,49 @@
   font-size: 0.7rem;
   color: var(--muted);
 }
-.badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  padding: 0.125rem 0.5rem;
-  font-size: 0.68rem;
-  background: #f3f4f6;
-  color: var(--text-subtle);
+.item__content {
+  min-width: 0;
 }
 
-/* ====== Form de Bienvenida ====== */
-.welcome-wrap {
-  min-height: calc(100vh - 3.5rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9fafb;
-  padding: 2rem 1rem;
+/* estado bloqueado (único) */
+.item--blocked .item__content {
+  opacity: 0.45;
+  filter: grayscale(0.25);
 }
-.form-card {
-  width: 100%;
-  max-width: 520px;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radii-lg);
-  box-shadow: var(--shadow-2);
-  padding: 1.25rem 1.25rem 1rem;
-}
-.form-title {
-  font-size: 1.65rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-  color: #0f172a;
-}
-.field {
-  margin-bottom: 0.9rem;
-}
-.label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 0.35rem;
-  color: #334155;
-}
-.input,
-.select {
-  width: 100%;
-  height: 2.5rem;
-  border: 1px solid #cbd5e1;
-  border-radius: var(--radii-md);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.95rem;
-  color: #0f172a;
-  background: #fff;
-  outline: none;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) inset;
-}
-.input:focus,
-.select:focus {
-  border-color: #2563eb;
-  box-shadow: var(--ring);
-}
-.form-actions {
-  margin-top: 0.9rem;
-}
-.btn-full {
-  width: 100%;
+.item--blocked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(229, 231, 235, 0.5);
+  border-radius: 0.375rem;
+  pointer-events: none;
 }
 
-/* ====== Botón toggle Activar/Activado ====== */
-.btn-toggle {
-  background: #e5e7eb;
-  color: #111827;
-  font-weight: 700;
-  padding: 6px 16px;
-  border-radius: var(--radii-md);
-  border: 2px solid transparent;
-  transition: all var(--speed-fast) ease;
-  outline: none;
-}
-.btn-toggle:hover {
-  background: #d1d5db;
-}
-.btn-toggle:focus-visible {
-  box-shadow: var(--ring);
-}
-.btn-toggle.active {
-  background: #15803d;
-  color: #fff;
-  border-color: #14532d;
-  box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.28);
-}
-.btn-toggle.active:hover {
-  background: #166534;
-}
-
-/* ===== Toggle pill ON/OFF ===== */
+/* ====== Toggle pill ON/OFF ====== */
 .switch {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 104px; /* ancho del pill */
+  width: 104px;
   height: 36px;
   border-radius: 9999px;
-  background: #e5e7eb; /* gris base */
+  background: #e5e7eb;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
   user-select: none;
+  margin-left: 0.75rem;
 }
-
 .switch.is-on {
-  background: #16a34a; /* verde on */
+  background: #16a34a;
   border-color: #14532d;
   box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.22);
 }
-
 .switch.is-disabled {
-  opacity: 0.45;
+  opacity: 0.85;
   cursor: not-allowed;
 }
-
 .switch__label {
   position: absolute;
   inset: 0;
@@ -391,14 +304,12 @@
   place-items: center;
   font-weight: 700;
   font-size: 0.82rem;
-  color: #111827; /* texto oscuro cuando está off */
+  color: #111827;
   pointer-events: none;
 }
-
 .switch.is-on .switch__label {
-  color: #fff; /* texto blanco cuando está on */
+  color: #fff;
 }
-
 .switch__knob {
   position: absolute;
   top: 3px;
@@ -408,16 +319,12 @@
   border-radius: 9999px;
   background: #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s;
   pointer-events: none;
 }
-
-/* Desplazamiento de la perilla cuando está encendido */
 .switch.is-on .switch__knob {
-  transform: translateX(68px); /* 104 - 30 - (3*2) = ~68 */
+  transform: translateX(68px);
 }
-
-/* Ajuste responsive opcional (móviles muy estrechos) */
 @media (max-width: 380px) {
   .switch {
     width: 96px;
@@ -427,135 +334,11 @@
   }
 }
 
-/* Item bloqueado: sobrefondo gris */
-.item--blocked {
-  position: relative;
-  opacity: 0.85;
-}
-.item--blocked::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 0.5rem;
-  pointer-events: none;
-}
-
-/* Mensaje de motivo */
-.block-note {
-  margin-left: auto;
-  text-align: right;
-  font-size: 0.72rem;
-  color: #374151;
-  max-width: 60%;
-}
-
-/* --- tarjetas en el slide --- */
-.item {
-  display: flex;
-  align-items: center; /* centra verticalmente */
-  justify-content: space-between;
-  gap: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
-  padding: 0.6rem 0;
-  position: relative;
-}
-
-.item__content {
-  min-width: 0;
-} /* permite truncar si es muy largo */
-
-.item--blocked .item__content {
-  opacity: 0.45;
-  filter: grayscale(0.25);
-}
-.item--blocked::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(229, 231, 235, 0.45); /* gris suave encima */
-  border-radius: 0.375rem;
-  pointer-events: none; /* no bloquea el hover del botón */
-}
-
-/* switch siempre a la derecha */
-.switch {
-  margin-left: 0.75rem;
-}
-
-/* opcional: cursor y foco en bloqueadas */
-.switch.is-disabled {
-  cursor: not-allowed;
-  opacity: 0.85;
-}
-
+/* Tooltip (única definición) */
 .switch-wrapper {
   position: relative;
   display: inline-block;
 }
-
-/* Tooltip personalizado */
-.tooltip {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  top: -42px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: 260px;
-  background: rgba(31, 41, 55, 0.95); /* gris oscuro */
-  color: #fff;
-  font-size: 0.75rem;
-  line-height: 1.1rem;
-  padding: 6px 10px;
-  border-radius: 6px;
-  text-align: center;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  z-index: 20;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-
-/* Triangulito */
-.tooltip::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: rgba(31, 41, 55, 0.95) transparent transparent transparent;
-}
-
-/* Mostrar al hacer hover */
-.switch-wrapper:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* Bloqueadas: fondo tenue */
-.item--blocked .item__content {
-  opacity: 0.45;
-  filter: grayscale(0.25);
-}
-.item--blocked::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(229, 231, 235, 0.5);
-  border-radius: 0.375rem;
-  pointer-events: none;
-}
-
-/* Contenedor del switch y el tooltip */
-.switch-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-/* Tooltip: centrado, con tope a los bordes y corrimiento dinámico */
 .tooltip {
   visibility: hidden;
   opacity: 0;
@@ -563,7 +346,6 @@
   top: -42px;
   left: 50%;
   transform: translateX(calc(-50% + var(--tip-shift, 0px)));
-  /* No pasar ancho de pantalla */
   max-width: min(320px, calc(100vw - 24px));
   width: max-content;
   background: rgba(31, 41, 55, 0.95);
@@ -573,15 +355,13 @@
   padding: 6px 10px;
   border-radius: 6px;
   text-align: center;
-  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.15s ease;
+  transition: opacity 0.2s, visibility 0.2s, transform 0.15s;
   z-index: 20;
   pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  white-space: normal; /* permite salto de línea */
-  word-break: break-word; /* evita desbordes por palabras largas */
+  white-space: normal;
+  word-break: break-word;
 }
-
-/* Triangulito */
 .tooltip::after {
   content: "";
   position: absolute;
@@ -592,69 +372,48 @@
   border-style: solid;
   border-color: rgba(31, 41, 55, 0.95) transparent transparent transparent;
 }
-
-/* Mostrar al hacer hover */
 .switch-wrapper:hover .tooltip {
   visibility: visible;
   opacity: 1;
 }
 
-/* Tarjeta bloqueada tenue (ya lo tenías) */
-.item--blocked .item__content {
-  opacity: 0.45;
-  filter: grayscale(0.25);
-}
-.item--blocked::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(229, 231, 235, 0.5);
-  border-radius: 0.375rem;
-  pointer-events: none;
-}
-
-/* ===== Usuario / Dropdown ===== */
+/* =================== Usuario / Dropdown =================== */
 .user-menu {
-  position: relative; /* <-- clave: ancla del dropdown */
+  position: relative;
   display: inline-block;
 }
-
 .user-trigger {
   font-size: 0.8rem;
-  color: #1f2937; /* gray-800 */
+  color: #1f2937;
   background: #f3f4f6;
   border: 1px solid var(--border);
   border-radius: 0.375rem;
   padding: 0.35rem 0.6rem;
   line-height: 1;
 }
-
 .user-trigger:hover {
   background: #e5e7eb;
 }
-
 .dropdown {
   position: absolute;
   right: 0;
-  top: 100%; /* justo DEBAJO del botón */
+  top: 100%;
   margin-top: 0.5rem;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.12);
   min-width: 220px;
-  z-index: 60; /* por encima del header */
+  z-index: 60;
   overflow: hidden;
 }
-
 .dropdown__info {
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem;
-  color: #4b5563; /* gray-600 */
+  color: #4b5563;
   border-bottom: 1px solid #f1f5f9;
   white-space: nowrap;
 }
-
 .dropdown__item {
   width: 100%;
   text-align: left;
@@ -664,23 +423,26 @@
   font-size: 0.9rem;
   cursor: pointer;
 }
-
 .dropdown__item:hover {
   background: #f3f4f6;
 }
 
 /* =================== Grafo (/graph) =================== */
 
-/* contenedor del canvas animado */
+/* Contenedor del canvas animado */
 .graph-shell {
+  position: relative; /* crea stacking context propio */
+  isolation: isolate; /* aísla el z-index del canvas */
+  z-index: 1; /* por encima de headers sticky de abajo */
   border: 1px solid var(--border);
   border-radius: var(--radii-lg);
   background: #fff;
   box-shadow: var(--shadow-1);
   overflow: hidden;
+  margin-top: 0.25rem;
 }
 
-/* toolbar de descargas/volver (usa .btn/.btn-slate/.btn-primary) */
+/* toolbar de descargas/volver */
 .graph-toolbar {
   display: flex;
   align-items: center;
@@ -695,11 +457,11 @@
   color: var(--text);
 }
 
-/* tarjetas de métricas (reusa .card) */
+/* tarjetas de métricas */
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 @media (min-width: 768px) {
   .metric-grid {
@@ -728,24 +490,20 @@
 
 /* contenedor tabla */
 .table-card {
+  position: relative; /* para controlar sticky internamente */
   border: 1px solid var(--border);
   border-radius: var(--radii-md);
   background: #fff;
   box-shadow: var(--shadow-1);
-  overflow: auto;
+  overflow: auto; /* scroll interno si hace falta */
+  z-index: 0; /* por debajo del grafo si se solapan */
 }
 
-/* tabla genérica con cabecera sticky */
+/* tabla genérica */
 .tbl {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-}
-.tbl thead tr {
-  background: #f1f5f9; /* slate-100 */
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 .tbl th,
 .tbl td {
@@ -762,14 +520,6 @@
 .tbl tbody tr:hover {
   background: #fafafa;
 }
-
-.note {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 0.5rem;
-}
-
-/* Tablas: zebra suave y cabecera sticky */
 .tbl tbody tr:nth-child(odd) {
   background: #fafafa;
 }
@@ -778,12 +528,32 @@
   color: var(--text-subtle);
 }
 
-/* Secciones separadas de forma consistente */
+/* ✅ sticky SOLO dentro del contenedor de tabla */
+.table-card .tbl thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f1f5f9;
+}
+
+/* notas auxiliares */
+.note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+/* separación vertical coherente entre secciones del main */
 main > section:not(:first-child) {
   margin-top: 0.25rem;
 }
 
-/* Contenedor del grafo para que no “salte” */
-.graph-shell {
-  margin-top: 0.25rem;
+/* Disclosure simple para matrices */
+.disclosure__btn {
+  border: 1px dashed var(--border);
+  background: #fff;
+  color: #1d4ed8;
+}
+.disclosure__btn:hover {
+  background: #f8fafc;
 }
