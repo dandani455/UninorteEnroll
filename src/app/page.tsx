@@ -1,65 +1,274 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+import { useEffect, useMemo, useState } from "react";
+import WeekCalendar from "@/components/WeekCalendar";
+import ProjectionPanel from "@/components/ProjectionPanel";
+import { useSchedule } from "@/store/schedule";
+import { useUser } from "@/store/user";
+
+type ProbeErr = string | null;
+
+export default function HomePage() {
+  /** ---------- Hooks (siempre arriba) ---------- */
+  const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ProbeErr>(null);
+
+  // Suscripciones finas al store (evita re-renders masivos)
+  const setData = useSchedule((s) => s.setData);
+  const subjects = useSchedule((s) => s.subjects);
+
+  const user = useUser((s) => s.user);
+  const setUser = useUser((s) => s.setUser);
+  const signOut = useUser((s) => s.signOut);
+
+  /** ---------- Carga de datos desde /public/data ---------- */
+  useEffect(() => {
+    (async () => {
+      try {
+        const [subjects, professors, sections, meetings] = await Promise.all([
+          fetch("/data/subjects.json", { cache: "no-store" }).then(
+            assertOkJson("subjects.json")
+          ),
+          fetch("/data/professors.json", { cache: "no-store" }).then(
+            assertOkJson("professors.json")
+          ),
+          fetch("/data/sections.json", { cache: "no-store" }).then(
+            assertOkJson("sections.json")
+          ),
+          fetch("/data/meetings.json", { cache: "no-store" }).then(
+            assertOkJson("meetings.json")
+          ),
+        ]);
+        setData({ subjects, professors, sections, meetings });
+        setError(null);
+      } catch (e) {
+        console.error(e);
+        setError(errorMessage(e));
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [setData]);
+
+  /** ---------- Derivados: semestres/carreras ---------- */
+  const SEMESTERS_AVAILABLE = useMemo(() => {
+    const s = new Set<number>();
+
+    for (const subj of subjects) {
+      // Validamos que el campo exista y sea número
+      const v = (subj as { semester?: unknown }).semester;
+      if (typeof v === "number") s.add(v);
+    }
+
+    return Array.from(s).sort((a, b) => a - b);
+  }, [subjects]);
+  // Si después agregas "career" en subjects, cámbialo a derivado:
+  const CAREERS_AVAILABLE = useMemo(() => ["Ingeniería de Sistemas"], []);
+
+  /** ---------- UI helpers ---------- */
+  function onSubmitWelcome(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("name") || "").trim();
+
+    const semester =
+      SEMESTERS_AVAILABLE.length === 1
+        ? SEMESTERS_AVAILABLE[0]
+        : Number(fd.get("semester"));
+
+    const career =
+      CAREERS_AVAILABLE.length === 1
+        ? CAREERS_AVAILABLE[0]
+        : String(fd.get("career"));
+
+    if (!name) return alert("Escribe tu nombre");
+    if (!semester) return alert("Selecciona semestre");
+
+    setUser({ name, semester, career });
+  }
+
+  /** ---------- Estados globales ---------- */
+  if (loading) {
+    return <p className="p-6">Cargando…</p>;
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: 16 }}>
+        <h2>⚠️ Error cargando datos</h2>
+        <pre style={{ whiteSpace: "pre-wrap" }}>{error}</pre>
+        <p>
+          Verifica que los JSON existan en <code>/public/data</code> y recarga:
+        </p>
+        <ul>
+          <li>/public/data/subjects.json</li>
+          <li>/public/data/professors.json</li>
+          <li>/public/data/sections.json</li>
+          <li>/public/data/meetings.json</li>
+        </ul>
+      </div>
+    );
+  }
+
+  /** ---------- Pantalla de bienvenida (sin sesión) ---------- */
+  if (!user) {
+    return (
+      <main className="welcome-wrap">
+        <form onSubmit={onSubmitWelcome} className="form-card">
+          <h1 className="form-title">Bienvenido</h1>
+
+          <div className="field">
+            <label className="label" htmlFor="name">
+              Nombre
+            </label>
+            <input
+              id="name"
+              name="name"
+              className="input"
+              placeholder="Tu nombre"
+              autoFocus
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          </div>
+
+          <div className="field">
+            <label className="label" htmlFor="career">
+              Carrera
+            </label>
+            {CAREERS_AVAILABLE.length === 1 ? (
+              <>
+                <input
+                  type="hidden"
+                  name="career"
+                  value={CAREERS_AVAILABLE[0]}
+                />
+                <select id="career" className="select" disabled>
+                  <option>{CAREERS_AVAILABLE[0]}</option>
+                </select>
+              </>
+            ) : (
+              <select
+                id="career"
+                name="career"
+                className="select"
+                defaultValue={CAREERS_AVAILABLE[0]}
+              >
+                {CAREERS_AVAILABLE.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="field">
+            <label className="label" htmlFor="semester">
+              Semestre
+            </label>
+            {SEMESTERS_AVAILABLE.length === 1 ? (
+              <>
+                <input
+                  type="hidden"
+                  name="semester"
+                  value={SEMESTERS_AVAILABLE[0]}
+                />
+                <select id="semester" className="select" disabled>
+                  <option>{SEMESTERS_AVAILABLE[0]}° semestre</option>
+                </select>
+              </>
+            ) : (
+              <select
+                id="semester"
+                name="semester"
+                className="select"
+                defaultValue={SEMESTERS_AVAILABLE[0]}
+              >
+                {SEMESTERS_AVAILABLE.map((s) => (
+                  <option key={s} value={s}>
+                    {s}° semestre
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="form-actions">
+            <button className="btn btn-green btn-full">Continuar</button>
+          </div>
+        </form>
       </main>
-    </div>
+    );
+  }
+
+  /** ---------- App (con sesión) ---------- */
+  return (
+    <>
+      <header className="topbar">
+        <div className="topbar__wrap">
+          <div className="brand">
+            <div className="brand__logo" />
+            <div className="brand__title">UNIVERSIDAD DEL NORTE</div>
+          </div>
+
+          <div className="flex items-center gap-3 relative">
+            <button className="btn btn-green" onClick={() => setOpen(true)}>
+              <span>📅</span> Mi proyección
+            </button>
+
+            <button
+              className="text-xs text-gray-800"
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              {user.name.toUpperCase()} ▾
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-10 bg-white border rounded-md shadow p-2 text-sm">
+                <div className="px-3 py-1 text-gray-600">
+                  {user.career} · {user.semester}°
+                </div>
+                <button
+                  className="w-full text-left px-3 py-1 hover:bg-gray-100 rounded"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    signOut();
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-[1200px] mx-auto mt-6">
+        <div className="calendar-shell p-4">
+          <WeekCalendar />
+        </div>
+      </div>
+
+      <ProjectionPanel open={open} onClose={() => setOpen(false)} />
+    </>
   );
+}
+
+/** ---------------- utilidades ---------------- */
+function assertOkJson(file: string) {
+  return async (r: Response) => {
+    if (!r.ok)
+      throw new Error(`No se pudo cargar ${file} (status ${r.status})`);
+    return r.json();
+  };
+}
+function errorMessage(e: unknown) {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "string") return e;
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return "Error desconocido";
+  }
 }

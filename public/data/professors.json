@@ -1,0 +1,50 @@
+[
+  {
+    "professorId": "p1",
+    "professorName": "Ana Pérez",
+    "email": "aperez@uninorte.edu.co",
+    "department": "Matemáticas"
+  },
+  {
+    "professorId": "p2",
+    "professorName": "Luis Soto",
+    "email": "lsoto@uninorte.edu.co",
+    "department": "Ingeniería"
+  },
+  {
+    "professorId": "p3",
+    "professorName": "Diana López",
+    "email": "dlopez@uninorte.edu.co",
+    "department": "Ciencias Computacionales"
+  },
+  {
+    "professorId": "p4",
+    "professorName": "Jorge Herrera",
+    "email": "jherrera@uninorte.edu.co",
+    "department": "Matemáticas"
+  },
+  {
+    "professorId": "p5",
+    "professorName": "Marta Gómez",
+    "email": "mgomez@uninorte.edu.co",
+    "department": "Comunicación y Lenguaje"
+  },
+  {
+    "professorId": "p6",
+    "professorName": "Ricardo Torres",
+    "email": "rtorres@uninorte.edu.co",
+    "department": "Ingeniería de Sistemas"
+  },
+  {
+    "professorId": "p7",
+    "professorName": "Laura Méndez",
+    "email": "lmendez@uninorte.edu.co",
+    "department": "Matemáticas"
+  },
+  {
+    "professorId": "p8",
+    "professorName": "Andrés Fontalvo",
+    "email": "afontalvo@uninorte.edu.co",
+    "department": "Ingeniería"
+  }
+]

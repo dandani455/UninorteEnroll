@@ -1,0 +1,32 @@
+[
+  {
+    "subjectCode": "IST 2088",
+    "subjectName": "Algoritmia y programación 1",
+    "semester": 1,
+    "credits": 3
+  },
+  {
+    "subjectCode": "MAT 1031",
+    "subjectName": "Algebra lineal",
+    "semester": 1,
+    "credits": 3
+  },
+  {
+    "subjectCode": "IST 0010",
+    "subjectName": "Introduccion a la ingenieria de sistemas",
+    "semester": 1,
+    "credits": 1
+  },
+  {
+    "subjectCode": "CAS 3020",
+    "subjectName": "Competencias comunicativas 1",
+    "semester": 1,
+    "credits": 3
+  },
+  {
+    "subjectCode": "MAT 1101",
+    "subjectName": "Calculo 1",
+    "semester": 1,
+    "credits": 5
+  }
+]
