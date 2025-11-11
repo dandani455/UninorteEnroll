@@ -668,3 +668,122 @@
 .dropdown__item:hover {
   background: #f3f4f6;
 }
+
+/* =================== Grafo (/graph) =================== */
+
+/* contenedor del canvas animado */
+.graph-shell {
+  border: 1px solid var(--border);
+  border-radius: var(--radii-lg);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+/* toolbar de descargas/volver (usa .btn/.btn-slate/.btn-primary) */
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* título de sección reutilizable */
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+/* tarjetas de métricas (reusa .card) */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+@media (min-width: 768px) {
+  .metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* chips de vértice coloreados */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-1);
+  font-size: 0.875rem;
+}
+.chip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  flex: 0 0 auto;
+}
+
+/* contenedor tabla */
+.table-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radii-md);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  overflow: auto;
+}
+
+/* tabla genérica con cabecera sticky */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.tbl thead tr {
+  background: #f1f5f9; /* slate-100 */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.tbl th,
+.tbl td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-top: 1px solid #eef2f7;
+  color: var(--text);
+}
+.tbl td.font-mono,
+.tbl th.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+.tbl tbody tr:hover {
+  background: #fafafa;
+}
+
+.note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+/* Tablas: zebra suave y cabecera sticky */
+.tbl tbody tr:nth-child(odd) {
+  background: #fafafa;
+}
+.tbl thead th {
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+/* Secciones separadas de forma consistente */
+main > section:not(:first-child) {
+  margin-top: 0.25rem;
+}
+
+/* Contenedor del grafo para que no “salte” */
+.graph-shell {
+  margin-top: 0.25rem;
+}

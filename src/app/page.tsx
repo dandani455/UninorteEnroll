@@ -5,11 +5,13 @@ import WeekCalendar from "@/components/WeekCalendar";
 import ProjectionPanel from "@/components/ProjectionPanel";
 import { useSchedule } from "@/store/schedule";
 import { useUser } from "@/store/user";
+import { useRouter } from "next/navigation";
 
 type ProbeErr = string | null;
 
 export default function HomePage() {
   /** ---------- Hooks (siempre arriba) ---------- */
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -232,6 +234,14 @@ export default function HomePage() {
             <div className="brand__logo" />
             <div className="brand__title">UNIVERSIDAD DEL NORTE</div>
           </div>
+
+          {/* 👉 Nuevo botón */}
+          <button
+            className="px-3 py-2 rounded bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+            onClick={() => router.push("/graph")}
+          >
+            🧠 Mostrar grafo
+          </button>
 
           <div className="flex items-center gap-3">
             <button className="btn btn-green" onClick={() => setOpen(true)}>
