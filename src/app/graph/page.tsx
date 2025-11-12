@@ -4,10 +4,9 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSchedule } from "@/store/schedule";
 import GraphCard from "@/components/GraphCard";
+import type { EdgeInfo, NodeLabel } from "@/components/GraphNotStatic";
 
-/* =========================================================
-   Helpers (tipados) 
-   ========================================================= */
+/* ================= Helpers tipados ================= */
 
 type TMoment = string | number | Date;
 
@@ -45,9 +44,7 @@ const toCsv = (rows: Row[]) =>
     .map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(","))
     .join("\n");
 
-/* =========================================================
-   Página
-   ========================================================= */
+/* ================= Página ================= */
 
 export default function GraphPage() {
   const { sections, meetings, graph, metrics, sectionByNrc } = useSchedule();
@@ -75,7 +72,7 @@ export default function GraphPage() {
     return list.sort();
   }, [graph]);
 
-  /* ---------- coloración greedy (solo demostración) ---------- */
+  /* ---------- coloración greedy (demo) ---------- */
   const coloring = useMemo(() => {
     const order = [...vertices].sort(
       (a, b) => (graph.get(b)?.size ?? 0) - (graph.get(a)?.size ?? 0)
@@ -83,8 +80,9 @@ export default function GraphPage() {
     const color = new Map<string, number>();
     for (const v of order) {
       const forbid = new Set<number>();
-      for (const u of graph.get(v) ?? [])
+      for (const u of graph.get(v) ?? []) {
         if (color.has(u)) forbid.add(color.get(u)!);
+      }
       let c = 0;
       while (forbid.has(c)) c++;
       color.set(v, c);
@@ -112,7 +110,41 @@ export default function GraphPage() {
     return map;
   }, [meetings]);
 
-  /* ---------- aristas con explicación (tipo + detalle) ---------- */
+  /* ---------- edgeInfo (tipo) para el canvas ---------- */
+  const edgeInfo: Map<string, EdgeInfo> = useMemo(() => {
+    const info = new Map<string, EdgeInfo>();
+    for (const [u, v] of edges) {
+      const su = sectionByNrc.get(u);
+      const sv = sectionByNrc.get(v);
+      const same =
+        su?.subjectCode && sv?.subjectCode && su.subjectCode === sv.subjectCode;
+
+      const key = u < v ? `${u}|${v}` : `${v}|${u}`;
+
+      if (same) {
+        info.set(key, { type: "same-subject", subjectCode: su!.subjectCode });
+        continue;
+      }
+
+      // Choque horario
+      const mu = meetingsByNrc.get(u) ?? [];
+      const mv = meetingsByNrc.get(v) ?? [];
+      let isClash = false;
+      outer: for (const a of mu) {
+        for (const b of mv) {
+          if (overlap(a, b)) {
+            isClash = true;
+            break outer;
+          }
+        }
+      }
+      // En nuestro grafo toda arista es incompatibilidad; igual marcamos explícitamente
+      info.set(key, { type: "time-overlap" });
+    }
+    return info;
+  }, [edges, sectionByNrc, meetingsByNrc]);
+
+  /* ---------- aristas con explicación (tabla / CSV) ---------- */
   type EdgeRow = {
     u: string;
     v: string;
@@ -122,25 +154,18 @@ export default function GraphPage() {
 
   const edgesDetailed: EdgeRow[] = useMemo(() => {
     const out: EdgeRow[] = [];
-
     for (const [u, v] of edges) {
       const su = sectionByNrc.get(u);
       const sv = sectionByNrc.get(v);
 
-      const sameSubject =
+      const same =
         su?.subjectCode && sv?.subjectCode && su.subjectCode === sv.subjectCode;
 
-      if (sameSubject) {
-        out.push({
-          u,
-          v,
-          type: "Misma materia",
-          detail: `${su!.subjectCode}`,
-        });
+      if (same) {
+        out.push({ u, v, type: "Misma materia", detail: su!.subjectCode });
         continue;
       }
 
-      // Busca el primer choque horario para explicar
       const mu = meetingsByNrc.get(u) ?? [];
       const mv = meetingsByNrc.get(v) ?? [];
       let detail = "";
@@ -154,16 +179,9 @@ export default function GraphPage() {
           }
         }
       }
-
-      out.push({
-        u,
-        v,
-        type: "Choque horario",
-        detail: detail || "—",
-      });
+      out.push({ u, v, type: "Choque horario", detail: detail || "—" });
     }
 
-    // ordena: primero choques horarios, luego misma materia, y por (u,v)
     out.sort((A, B) => {
       if (A.type !== B.type) return A.type === "Choque horario" ? -1 : 1;
       if (A.u !== B.u) return A.u.localeCompare(B.u);
@@ -193,7 +211,7 @@ export default function GraphPage() {
     return m;
   }, [showMatrix, vertices, graph]);
 
-  /* ---------- CSVs ---------- */
+  /* --------- CSV --------- */
   const csvEdges = useMemo(() => {
     const rows: Row[] = [["u", "v", "tipo", "detalle"]];
     edgesDetailed.forEach((e) => rows.push([e.u, e.v, e.type, e.detail]));
@@ -207,9 +225,35 @@ export default function GraphPage() {
     return toCsv([header, ...body]);
   }, [showMatrix, matrix, vertices]);
 
-  /* =========================================================
-     Render
-     ========================================================= */
+  /* ---------- etiquetas con nombre y NRC ---------- */
+  const labels = useMemo(() => {
+    const map = new Map<string, NodeLabel>();
+
+    // Crea un mapa de subjectCode → subjectName
+    const subjName = new Map<string, string>();
+    const subjects = useSchedule.getState().subjects as {
+      subjectCode: string;
+      subjectName: string;
+    }[];
+
+    for (const subj of subjects) {
+      subjName.set(subj.subjectCode, subj.subjectName);
+    }
+
+    // Asigna nombre + NRC a cada sección
+    for (const s of sections) {
+      const name = subjName.get(s.subjectCode) ?? s.subjectCode;
+      map.set(s.nrc, {
+        title: name, // Muestra el nombre de la materia
+        subtitle: String(s.nrc), // Muestra el NRC debajo
+      });
+    }
+
+    return map;
+  }, [sections]);
+
+  /* ================= Render ================= */
+
   return (
     <div>
       {/* Topbar */}
@@ -316,16 +360,18 @@ export default function GraphPage() {
           </div>
         </section>
 
-        {/* Grafo en su propio marco */}
+        {/* Grafo */}
         <GraphCard
           title="Grafo (vista general)"
           height={360}
           vertices={vertices}
           edges={edges}
           coloring={coloring}
+          labels={labels}
+          edgeInfo={edgeInfo}
         />
 
-        {/* Aristas (ahora con tipo y detalle) */}
+        {/* Aristas (tabla con tipo/detalle) */}
         <section>
           <h2 className="section-title">Aristas (conflictos)</h2>
           <div className="table-card max-h-96">

@@ -263,14 +263,14 @@ export default function HomePage() {
             {/* Mostrar grafo */}
             <Link
               href="/graph"
-              className="btn btn-ghost"
-              aria-label="Abrir vista del grafo de NRC"
+              className="btn-slate flex items-center gap-2"
+              title="Ver grafo de NRC"
             >
-              <span aria-hidden>🧠</span>
+              <span>🧩</span>
               <span>Mostrar grafo</span>
             </Link>
 
-            {/* ✨ Generar horario (abre su propio modal) */}
+            {/* Generar horario (botón + modal interno) */}
             <GenerateSchedule />
 
             {/* Mi proyección */}
