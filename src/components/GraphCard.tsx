@@ -8,7 +8,6 @@ type Props = {
   vertices: string[];
   edges: Edge[];
   coloring?: Map<string, number>;
-  // extras para mejorar legibilidad
   labels?: Map<string, NodeLabel>;
   edgeInfo?: Map<string, EdgeInfo>;
 };
@@ -68,8 +67,7 @@ export default function GraphCard({
 
       <p className="note mt-2">
         Pasa el mouse por un nodo para resaltar sus conflictos. Las etiquetas
-        muestran
-        <b> NRC</b> y <b>materia</b>.
+        muestran <b>NRC</b> y <b>materia</b>.
       </p>
     </section>
   );

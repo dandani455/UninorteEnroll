@@ -1,19 +1,41 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+
 import WeekCalendar from "@/components/WeekCalendar";
 import ProjectionPanel from "@/components/ProjectionPanel";
 import { useSchedule } from "@/store/schedule";
 import { useUser } from "@/store/user";
-import { useRouter } from "next/navigation";
+import GenerateSchedule from "@/components/GenerateSchedule";
+
+/* =================== Utils (fuera del componente) =================== */
+function assertOkJson(file: string) {
+  return async (r: Response) => {
+    if (!r.ok)
+      throw new Error(`No se pudo cargar ${file} (status ${r.status})`);
+    return r.json();
+  };
+}
+
+function errorMessage(e: unknown) {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "string") return e;
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return "Error desconocido";
+  }
+}
+
+/* =================================================================== */
 
 type ProbeErr = string | null;
 
 export default function HomePage() {
   /** ---------- Hooks (siempre arriba) ---------- */
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false); // Modal "Mi proyección"
+  const [menuOpen, setMenuOpen] = useState(false); // Menú de usuario
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ProbeErr>(null);
 
@@ -230,25 +252,34 @@ export default function HomePage() {
     <>
       <header className="topbar">
         <div className="topbar__wrap">
+          {/* Brand (izquierda) */}
           <div className="brand">
             <div className="brand__logo" />
             <div className="brand__title">UNIVERSIDAD DEL NORTE</div>
           </div>
 
-          {/* 👉 Nuevo botón */}
-          <button
-            className="px-3 py-2 rounded bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
-            onClick={() => router.push("/graph")}
-          >
-            🧠 Mostrar grafo
-          </button>
-
+          {/* Acciones (derecha) */}
           <div className="flex items-center gap-3">
+            {/* Mostrar grafo */}
+            <Link
+              href="/graph"
+              className="btn-slate flex items-center gap-2"
+              title="Ver grafo de NRC"
+            >
+              <span>🧩</span>
+              <span>Mostrar grafo</span>
+            </Link>
+
+            {/* Generar horario (botón + modal interno) */}
+            <GenerateSchedule />
+
+            {/* Mi proyección */}
             <button className="btn btn-green" onClick={() => setOpen(true)}>
-              <span>📅</span> Mi proyección
+              <span aria-hidden>📅</span>
+              <span>Mi proyección</span>
             </button>
 
-            {/* Contenedor RELATIVO del menú */}
+            {/* User menu (anclado en relativo) */}
             <div ref={menuRef} className="user-menu">
               <button
                 className="user-trigger"
@@ -290,22 +321,4 @@ export default function HomePage() {
       <ProjectionPanel open={open} onClose={() => setOpen(false)} />
     </>
   );
-}
-
-/** ---------------- utilidades ---------------- */
-function assertOkJson(file: string) {
-  return async (r: Response) => {
-    if (!r.ok)
-      throw new Error(`No se pudo cargar ${file} (status ${r.status})`);
-    return r.json();
-  };
-}
-function errorMessage(e: unknown) {
-  if (e instanceof Error) return e.message;
-  if (typeof e === "string") return e;
-  try {
-    return JSON.stringify(e);
-  } catch {
-    return "Error desconocido";
-  }
 }
