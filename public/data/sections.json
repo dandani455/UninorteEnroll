@@ -1,57 +1,127 @@
 [
   {
-    "nrc": "10011",
+    "nrc": "2453",
     "subjectCode": "IST 2088",
-    "professorId": "p6"
-  },
-  {
-    "nrc": "10012",
-    "subjectCode": "IST 2088",
-    "professorId": "p8"
-  },
-  {
-    "nrc": "10021",
-    "subjectCode": "MAT 1031",
     "professorId": "p1"
   },
   {
-    "nrc": "10022",
-    "subjectCode": "MAT 1031",
+    "nrc": "2454",
+    "subjectCode": "IST 2088",
+    "professorId": "p1"
+  },
+  {
+    "nrc": "2455",
+    "subjectCode": "IST 2088",
+    "professorId": "p1"
+  },
+  {
+    "nrc": "4025",
+    "subjectCode": "IST 2088",
+    "professorId": "p2"
+  },
+  {
+    "nrc": "4026",
+    "subjectCode": "IST 2088",
+    "professorId": "p3"
+  },
+  {
+    "nrc": "4027",
+    "subjectCode": "IST 2088",
     "professorId": "p4"
   },
   {
-    "nrc": "10023",
+    "nrc": "4028",
+    "subjectCode": "IST 2088",
+    "professorId": "p4"
+  },
+  {
+    "nrc": "2619",
+    "subjectCode": "MAT 1031",
+    "professorId": "p5"
+  },
+  {
+    "nrc": "2620",
+    "subjectCode": "MAT 1031",
+    "professorId": "p5"
+  },
+  {
+    "nrc": "2621",
+    "subjectCode": "MAT 1031",
+    "professorId": "p5"
+  },
+  {
+    "nrc": "2622",
+    "subjectCode": "MAT 1031",
+    "professorId": "p6"
+  },
+  {
+    "nrc": "2623",
+    "subjectCode": "MAT 1031",
+    "professorId": "p6"
+  },
+  {
+    "nrc": "2624",
     "subjectCode": "MAT 1031",
     "professorId": "p7"
   },
   {
-    "nrc": "10031",
-    "subjectCode": "IST 0010",
-    "professorId": "p2"
-  },
-  {
-    "nrc": "10032",
-    "subjectCode": "IST 0010",
-    "professorId": "p6"
-  },
-  {
-    "nrc": "10041",
-    "subjectCode": "CAS 3020",
-    "professorId": "p5"
-  },
-  {
-    "nrc": "10042",
-    "subjectCode": "CAS 3020",
-    "professorId": "p5"
-  },
-  {
-    "nrc": "10051",
+    "nrc": "2625",
     "subjectCode": "MAT 1101",
-    "professorId": "p1"
+    "professorId": "p8"
   },
   {
-    "nrc": "10052",
+    "nrc": "2626",
     "subjectCode": "MAT 1101",
-    "professorId": "p4"
+    "professorId": "p9"
+  },
+  {
+    "nrc": "2627",
+    "subjectCode": "MAT 1101",
+    "professorId": "p10"
+  },
+  {
+    "nrc": "2628",
+    "subjectCode": "MAT 1101",
+    "professorId": "p11"
+  },
+  {
+    "nrc": "4023",
+    "subjectCode": "IST 0010",
+    "professorId": "p12"
+  },
+  {
+    "nrc": "4024",
+    "subjectCode": "IST 0010",
+    "professorId": "P12"
+  },
+  {
+    "nrc": "4025",
+    "subjectCode": "IST 0010",
+    "professorId": "P12"
+  },
+  {
+    "nrc": "1417",
+    "subjectCode": "CAS 3020",
+    "professorId": "p13"
+  },
+  {
+    "nrc": "1418",
+    "subjectCode": "CAS 3020",
+    "professorId": "p14"
+  },
+  {
+    "nrc": "1419",
+    "subjectCode": "CAS 3020",
+    "professorId": "p14"
+  },
+  {
+    "nrc": "1420",
+    "subjectCode": "CAS 3020",
+    "professorId": "p15"
+  },
+  {
+    "nrc": "1421",
+    "subjectCode": "CAS 3020",
+    "professorId": "p15"
   }
 ]

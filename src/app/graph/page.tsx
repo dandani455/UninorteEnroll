@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useSchedule } from "@/store/schedule";
 import GraphCard from "@/components/GraphCard";
 import type { EdgeInfo, NodeLabel } from "@/components/GraphNotStatic";
+import Image from "next/image";
 
 /* ================= Helpers tipados ================= */
 
@@ -260,7 +261,13 @@ export default function GraphPage() {
       <div className="topbar">
         <div className="topbar__wrap">
           <div className="brand">
-            <div className="brand__logo" />
+            <Image
+              src="/img/logo_UNINORTE.png"
+              alt="Universidad del Norte"
+              width={42}
+              height={42}
+              className="object-contain"
+            />
             <div className="brand__title">
               Grafo de NRC{" "}
               <span className="text-sm text-gray-500">

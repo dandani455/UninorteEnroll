@@ -115,6 +115,8 @@ export default function GenerateSchedule() {
     alert(`✅ Horario generado (${best.size} NRC seleccionados).`);
   };
 
+  //console.log("Todos los subjectCode encontrados:", [...subjects.keys()]);
+
   /* ===== Render ===== */
   return (
     <>

@@ -21,11 +21,26 @@ export default function GraphCard({
   labels,
   edgeInfo,
 }: Props) {
+  /* ============================
+     REGLAS AUTOMÁTICAS DE RENDIMIENTO
+  ===============================*/
+
+  const N = vertices.length;
+
+  // labels solo si hay pocos nodos
+  const showLabels = N <= 25; // perfecto para 1er semestre, segunda carga, etc.
+
+  // hover solo si no colapsa performance
+  const emphasizeHover = N <= 40;
+
+  // modo rendimiento: baja alpha, baja animación (lo manejamos dentro del canvas)
+  const performanceMode = N >= 60;
+
   return (
     <section aria-label="graph-section">
       <h2 className="section-title">{title}</h2>
 
-      {/* Leyenda compacta */}
+      {/* ----- Leyenda ----- */}
       <div className="legend mb-2">
         <div className="legend__item">
           <span
@@ -48,7 +63,7 @@ export default function GraphCard({
         </div>
       </div>
 
-      {/* Marco del grafo */}
+      {/* ----- Marco del grafo ----- */}
       <div className="graph-shell">
         <div className="graph-box" style={{ height }}>
           <GraphNotStatic
@@ -57,17 +72,18 @@ export default function GraphCard({
             coloring={coloring}
             height={height}
             showGuide={false}
-            showLabels={true}
+            showLabels={showLabels}
             labels={labels}
             edgeInfo={edgeInfo}
-            emphasizeHover={true}
+            emphasizeHover={emphasizeHover}
+            performanceMode={performanceMode} // 🔥 NUEVO
           />
         </div>
       </div>
 
       <p className="note mt-2">
         Pasa el mouse por un nodo para resaltar sus conflictos. Las etiquetas
-        muestran <b>NRC</b> y <b>materia</b>.
+        solo se muestran cuando el grafo es pequeño.
       </p>
     </section>
   );

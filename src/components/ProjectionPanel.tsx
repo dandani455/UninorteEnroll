@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSchedule } from "@/store/schedule";
 
 type Props = { open: boolean; onClose: () => void; title?: string };
@@ -49,7 +49,7 @@ export default function ProjectionPanel({
     graph, // Map<string, Set<string>>
   } = useSchedule();
 
-  // mapas auxiliares
+  /* ===== Mapas auxiliares ===== */
   const profById = useMemo(
     () => new Map(professors.map((p) => [p.professorId, p.professorName])),
     [professors]
@@ -88,6 +88,31 @@ export default function ProjectionPanel({
     return map;
   }, [sections]);
 
+  /* ===== Estado de acordeones (materias & profesores) ===== */
+
+  // materias abiertas (MAT 1031, CAS 3020, etc.)
+  const [openSubjects, setOpenSubjects] = useState<Set<string>>(new Set());
+
+  // grupos profe-abierto, key = "MAT 1031::PROF_ID"
+  const [openProfGroups, setOpenProfGroups] = useState<Set<string>>(new Set());
+
+  const toggleSubjectOpen = (subjectCode: string) => {
+    setOpenSubjects((prev) => {
+      const next = new Set(prev);
+      next.has(subjectCode) ? next.delete(subjectCode) : next.add(subjectCode);
+      return next;
+    });
+  };
+
+  const toggleProfOpen = (subjectCode: string, professorId: string) => {
+    const key = `${subjectCode}::${professorId}`;
+    setOpenProfGroups((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
+
   // --- Corrige posición del tooltip para que no se salga de la pantalla ---
   function fixTooltipWithinViewport(wrapper: HTMLDivElement) {
     const tip = wrapper.querySelector<HTMLDivElement>(".tooltip");
@@ -120,9 +145,24 @@ export default function ProjectionPanel({
         <div className="modal__body">
           {subjects.map((subj) => {
             const secs = sectionsBySubject.get(subj.subjectCode) ?? [];
+            const isSubjOpen = openSubjects.has(subj.subjectCode);
+
+            // Agrupamos secciones de la materia por profesor
+            const profMap = new Map<string, string[]>(); // profId -> NRC[]
+            for (const { nrc, professorId } of secs) {
+              const arr = profMap.get(professorId) ?? [];
+              arr.push(nrc);
+              profMap.set(professorId, arr);
+            }
+
             return (
-              <div key={subj.subjectCode} className="card">
-                <div className="item">
+              <div key={subj.subjectCode} className="card subject-card">
+                {/* ===== CABECERA MATERIA (nivel 1) ===== */}
+                <button
+                  type="button"
+                  className="subject-header"
+                  onClick={() => toggleSubjectOpen(subj.subjectCode)}
+                >
                   <div>
                     <div className="item__title">
                       {subj.subjectCode} — {subj.subjectName}
@@ -132,113 +172,191 @@ export default function ProjectionPanel({
                       {secs.length || 0}
                     </div>
                   </div>
-                  <span className="badge">{subj.semester}° semestre</span>
-                </div>
-
-                {secs.map(({ nrc, professorId }) => {
-                  const meets = (meetingsByNrc.get(nrc) ?? [])
-                    .map((m) => `${m.day} ${m.start}–${m.end}`)
-                    .join(" · ");
-                  const prof = profById.get(professorId) ?? professorId;
-
-                  const isSelected = selected.has(nrc);
-                  const isDisabled = conflicts.has(nrc) && !isSelected;
-
-                  // ---- razón de bloqueo (primer conflicto encontrado) ----
-                  let reasonText = "";
-                  if (isDisabled) {
-                    const neighbors = graph.get(nrc) as Set<string> | undefined;
-                    const blockers: string[] = neighbors
-                      ? [...neighbors].filter((x: string) => selected.has(x))
-                      : [];
-
-                    if (blockers.length) {
-                      const blocker = blockers[0];
-                      const secA = secByNrc.get(nrc);
-                      const secB = secByNrc.get(blocker);
-                      const subjA = secA
-                        ? subjByCode.get(secA.subjectCode)
-                        : undefined;
-                      const subjB = secB
-                        ? subjByCode.get(secB.subjectCode)
-                        : undefined;
-
-                      if (
-                        secA &&
-                        secB &&
-                        secA.subjectCode === secB.subjectCode
-                      ) {
-                        // misma materia
-                        reasonText = `Ya tienes activa otra sección de ${
-                          subjA?.subjectName ?? secA.subjectCode
-                        } (NRC ${blocker})`;
-                      } else {
-                        // choque horario (resumen de la otra sección)
-                        const bm = (meetingsByNrc.get(blocker) ?? [])
-                          .map((m) => `${m.day} ${m.start}–${m.end}`)
-                          .join(" · ");
-                        reasonText = `Choque con ${
-                          subjB?.subjectName ??
-                          secB?.subjectCode ??
-                          "otra materia"
-                        } — NRC ${blocker}${bm ? ` — ${bm}` : ""}`;
-                      }
-                    }
-                  }
-
-                  return (
-                    <div
-                      key={nrc}
-                      className={`item ${isDisabled ? "item--blocked" : ""}`}
+                  <div className="subject-header__right">
+                    <span className="badge">
+                      {subj.semester ?? "—"}° semestre
+                    </span>
+                    <span
+                      className={`accordion-chevron ${
+                        isSubjOpen ? "is-open" : ""
+                      }`}
                     >
-                      <div className="item__content">
-                        <div className="item__title">Prof. {prof}</div>
-                        <div className="item__meta">
-                          NRC {nrc} · {meets || "horario por definir"}
+                      ▾
+                    </span>
+                  </div>
+                </button>
+
+                {/* ===== CUERPO MATERIA ===== */}
+                {isSubjOpen && (
+                  <div className="accordion-body">
+                    {[...profMap.entries()].map(([profId, nrcList]) => {
+                      const profName =
+                        profById.get(profId) ?? profId ?? "Profesor";
+                      const key = `${subj.subjectCode}::${profId}`;
+                      const isProfOpen = openProfGroups.has(key);
+
+                      return (
+                        <div key={key} className="prof-block">
+                          {/* --- CABECERA PROFESOR (nivel 2) --- */}
+                          <button
+                            type="button"
+                            className="prof-header"
+                            onClick={() =>
+                              toggleProfOpen(subj.subjectCode, profId)
+                            }
+                          >
+                            <div>
+                              <div className="item__title">
+                                Prof. {profName}
+                              </div>
+                              <div className="item__meta">
+                                Opciones: {nrcList.length}
+                              </div>
+                            </div>
+                            <span
+                              className={`accordion-chevron ${
+                                isProfOpen ? "is-open" : ""
+                              }`}
+                            >
+                              ▾
+                            </span>
+                          </button>
+
+                          {/* --- CUERPO PROFESOR: lista de NRC (nivel 3) --- */}
+                          {isProfOpen && (
+                            <div className="prof-body">
+                              {nrcList.map((nrc) => {
+                                const meets = (meetingsByNrc.get(nrc) ?? [])
+                                  .map((m) => `${m.day} ${m.start}–${m.end}`)
+                                  .join(" · ");
+
+                                const isSelected = selected.has(nrc);
+                                const isDisabled =
+                                  conflicts.has(nrc) && !isSelected;
+
+                                // ---- razón de bloqueo (primer conflicto encontrado) ----
+                                let reasonText = "";
+                                if (isDisabled) {
+                                  const neighbors = graph.get(nrc) as
+                                    | Set<string>
+                                    | undefined;
+                                  const blockers: string[] = neighbors
+                                    ? [...neighbors].filter((x: string) =>
+                                        selected.has(x)
+                                      )
+                                    : [];
+
+                                  if (blockers.length) {
+                                    const blocker = blockers[0];
+                                    const secA = secByNrc.get(nrc);
+                                    const secB = secByNrc.get(blocker);
+                                    const subjA = secA
+                                      ? subjByCode.get(secA.subjectCode)
+                                      : undefined;
+                                    const subjB = secB
+                                      ? subjByCode.get(secB.subjectCode)
+                                      : undefined;
+
+                                    if (
+                                      secA &&
+                                      secB &&
+                                      secA.subjectCode === secB.subjectCode
+                                    ) {
+                                      // misma materia
+                                      reasonText = `Ya tienes activa otra sección de ${
+                                        subjA?.subjectName ?? secA.subjectCode
+                                      } (NRC ${blocker})`;
+                                    } else {
+                                      // choque horario (resumen de la otra sección)
+                                      const bm = (
+                                        meetingsByNrc.get(blocker) ?? []
+                                      )
+                                        .map(
+                                          (m) => `${m.day} ${m.start}–${m.end}`
+                                        )
+                                        .join(" · ");
+                                      reasonText = `Choque con ${
+                                        subjB?.subjectName ??
+                                        secB?.subjectCode ??
+                                        "otra materia"
+                                      } — NRC ${blocker}${
+                                        bm ? ` — ${bm}` : ""
+                                      }`;
+                                    }
+                                  }
+                                }
+
+                                return (
+                                  <div
+                                    key={nrc}
+                                    className={`item item--nrc ${
+                                      isDisabled ? "item--blocked" : ""
+                                    }`}
+                                  >
+                                    <div className="item__content">
+                                      <div className="item__meta">
+                                        NRC {nrc} ·{" "}
+                                        {meets || "horario por definir"}
+                                      </div>
+                                    </div>
+
+                                    {/* Wrapper del switch + tooltip con corrección de overflow */}
+                                    <div
+                                      className="switch-wrapper"
+                                      onMouseEnter={(e) =>
+                                        fixTooltipWithinViewport(
+                                          e.currentTarget as HTMLDivElement
+                                        )
+                                      }
+                                      onFocus={(e) =>
+                                        fixTooltipWithinViewport(
+                                          e.currentTarget as HTMLDivElement
+                                        )
+                                      }
+                                    >
+                                      <button
+                                        type="button"
+                                        className={`switch ${
+                                          isSelected ? "is-on" : ""
+                                        } ${isDisabled ? "is-disabled" : ""}`}
+                                        aria-pressed={isSelected}
+                                        disabled={isDisabled}
+                                        onClick={() => toggle(nrc)}
+                                        title={
+                                          isDisabled
+                                            ? reasonText ||
+                                              "Conflicto con tu selección"
+                                            : undefined
+                                        }
+                                      >
+                                        <span className="switch__label">
+                                          {isSelected ? "Activado" : "Activar"}
+                                        </span>
+                                        <span className="switch__knob" />
+                                      </button>
+
+                                      {isDisabled && reasonText && (
+                                        <div className="tooltip">
+                                          {reasonText}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      );
+                    })}
 
-                      {/* Wrapper del switch + tooltip con corrección de overflow */}
-                      <div
-                        className="switch-wrapper"
-                        onMouseEnter={(e) =>
-                          fixTooltipWithinViewport(
-                            e.currentTarget as HTMLDivElement
-                          )
-                        }
-                        onFocus={(e) =>
-                          fixTooltipWithinViewport(
-                            e.currentTarget as HTMLDivElement
-                          )
-                        }
-                      >
-                        <button
-                          type="button"
-                          className={`switch ${isSelected ? "is-on" : ""} ${
-                            isDisabled ? "is-disabled" : ""
-                          }`}
-                          aria-pressed={isSelected}
-                          disabled={isDisabled}
-                          onClick={() => toggle(nrc)}
-                          title={
-                            isDisabled
-                              ? reasonText || "Conflicto con tu selección"
-                              : undefined
-                          }
-                        >
-                          <span className="switch__label">
-                            {isSelected ? "Activado" : "Activar"}
-                          </span>
-                          <span className="switch__knob" />
-                        </button>
-
-                        {isDisabled && reasonText && (
-                          <div className="tooltip">{reasonText}</div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                    {profMap.size === 0 && (
+                      <p className="note text-sm mt-1">
+                        No hay secciones cargadas para esta materia.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

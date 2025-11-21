@@ -8,6 +8,7 @@ import ProjectionPanel from "@/components/ProjectionPanel";
 import { useSchedule } from "@/store/schedule";
 import { useUser } from "@/store/user";
 import GenerateSchedule from "@/components/GenerateSchedule";
+import Image from "next/image";
 
 /* =================== Utils (fuera del componente) =================== */
 function assertOkJson(file: string) {
@@ -252,57 +253,36 @@ export default function HomePage() {
     <>
       <header className="topbar">
         <div className="topbar__wrap">
-          {/* Brand (izquierda) */}
           <div className="brand">
             <div className="brand__logo" />
             <div className="brand__title">UNIVERSIDAD DEL NORTE</div>
           </div>
 
-          {/* Acciones (derecha) */}
-          <div className="flex items-center gap-3">
-            {/* Mostrar grafo */}
-            <Link
-              href="/graph"
-              className="btn-slate flex items-center gap-2"
-              title="Ver grafo de NRC"
-            >
-              <span>🧩</span>
-              <span>Mostrar grafo</span>
+          <div className="topbar-buttons">
+            <Link href="/graph" className="btn-slate">
+              Mostrar grafo
             </Link>
 
-            {/* Generar horario (botón + modal interno) */}
             <GenerateSchedule />
 
-            {/* Mi proyección */}
-            <button className="btn btn-green" onClick={() => setOpen(true)}>
-              <span aria-hidden>📅</span>
-              <span>Mi proyección</span>
+            <button className="btn-green" onClick={() => setOpen(true)}>
+              📅 Mi proyección
             </button>
 
-            {/* User menu (anclado en relativo) */}
             <div ref={menuRef} className="user-menu">
               <button
                 className="user-trigger"
                 onClick={() => setMenuOpen((v) => !v)}
-                aria-haspopup="menu"
-                aria-expanded={menuOpen}
               >
                 {user.name.toUpperCase()} ▾
               </button>
 
               {menuOpen && (
-                <div role="menu" className="dropdown">
+                <div className="dropdown">
                   <div className="dropdown__info">
                     {user.career} · {user.semester}°
                   </div>
-                  <button
-                    role="menuitem"
-                    className="dropdown__item"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      signOut();
-                    }}
-                  >
+                  <button className="dropdown__item" onClick={signOut}>
                     Cerrar sesión
                   </button>
                 </div>
