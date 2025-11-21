@@ -37,13 +37,14 @@ export type NodeLabel = {
 type Props = {
   vertices: string[];
   edges: Edge[];
-  coloring?: Map<string, number>; // color por grupo (greedy)
+  coloring?: Map<string, number>;
   height?: number;
-  showGuide?: boolean; // círculo guía
-  showLabels?: boolean; // etiquetas visibles
-  edgeInfo?: Map<string, EdgeInfo>; // clave "u|v" ordenada
-  labels?: Map<string, NodeLabel>; // info para cada vértice
-  emphasizeHover?: boolean; // atenúa no incidentes al hacer hover
+  showGuide?: boolean;
+  showLabels?: boolean;
+  edgeInfo?: Map<string, EdgeInfo>;
+  labels?: Map<string, NodeLabel>;
+  emphasizeHover?: boolean;
+  performanceMode?: boolean; // ←🔥 NECESARIO
 };
 
 export default function GraphNotStatic({

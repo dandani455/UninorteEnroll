@@ -10,6 +10,9 @@ type Props = {
   coloring?: Map<string, number>;
   labels?: Map<string, NodeLabel>;
   edgeInfo?: Map<string, EdgeInfo>;
+
+  // 🔥 Necesario para que Vercel compile
+  performanceMode?: boolean;
 };
 
 export default function GraphCard({
@@ -20,6 +23,9 @@ export default function GraphCard({
   coloring,
   labels,
   edgeInfo,
+
+  // 🔥 default seguro
+  performanceMode = false,
 }: Props) {
   /* ============================
      REGLAS AUTOMÁTICAS DE RENDIMIENTO
@@ -28,13 +34,13 @@ export default function GraphCard({
   const N = vertices.length;
 
   // labels solo si hay pocos nodos
-  const showLabels = N <= 25; // perfecto para 1er semestre, segunda carga, etc.
+  const showLabels = N <= 25;
 
   // hover solo si no colapsa performance
   const emphasizeHover = N <= 40;
 
-  // modo rendimiento: baja alpha, baja animación (lo manejamos dentro del canvas)
-  const performanceMode = N >= 60;
+  // modo rendimiento: baja animación si hay muchos nodos
+  const computedPerformanceMode = performanceMode || N >= 60;
 
   return (
     <section aria-label="graph-section">
@@ -57,9 +63,7 @@ export default function GraphCard({
         </div>
         <div className="legend__item">
           <span className="legend__line legend__line--dash" />
-          <span>
-            Arista discontinua = misma materia (secciones alternativas)
-          </span>
+          <span>Arista discontinua = misma materia (alternativas)</span>
         </div>
       </div>
 
@@ -76,7 +80,7 @@ export default function GraphCard({
             labels={labels}
             edgeInfo={edgeInfo}
             emphasizeHover={emphasizeHover}
-            performanceMode={performanceMode} // 🔥 NUEVO
+            performanceMode={computedPerformanceMode} // ← OK
           />
         </div>
       </div>
@@ -88,3 +92,4 @@ export default function GraphCard({
     </section>
   );
 }
+  
