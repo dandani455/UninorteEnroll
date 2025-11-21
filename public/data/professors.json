@@ -1,50 +1,92 @@
 [
   {
     "professorId": "p1",
-    "professorName": "Ana Pérez",
-    "email": "aperez@uninorte.edu.co",
-    "department": "Matemáticas"
+    "professorName": "LUCY ESTHER GARCIA RAMOS",
+    "email": "lucyesther@uninorte.edu.co",
+    "department": "Ingenieria de Sistemas"
   },
   {
     "professorId": "p2",
-    "professorName": "Luis Soto",
-    "email": "lsoto@uninorte.edu.co",
-    "department": "Ingeniería"
+    "professorName": "SANDRA MILENA DIAZ DUARTE",
+    "email": "sandradiaz@uninorte.edu.co",
+    "department": "Ingenieria de Sistemas"
   },
   {
     "professorId": "p3",
-    "professorName": "Diana López",
-    "email": "dlopez@uninorte.edu.co",
-    "department": "Ciencias Computacionales"
+    "professorName": "CAMILO ERNESTO IGLESIAS MONSALVE",
+    "email": "Camiglesiasm@uninorte.edu.co",
+    "department": "Ingenieria de Sistemas"
   },
   {
     "professorId": "p4",
-    "professorName": "Jorge Herrera",
-    "email": "jherrera@uninorte.edu.co",
-    "department": "Matemáticas"
+    "professorName": "ROCIO DEL ROSARIO RAMOS RODRIGUEZ",
+    "email": "rrrr@uninorte.edu.co",
+    "department": "Ingenieria de Sistemas"
   },
   {
     "professorId": "p5",
-    "professorName": "Marta Gómez",
-    "email": "mgomez@uninorte.edu.co",
-    "department": "Comunicación y Lenguaje"
+    "professorName": "LUZ ADRIANA MEJIA CASTAÑO",
+    "email": "luzmejia@uninorte.edu.co",
+    "department": "Matematicas"
   },
   {
     "professorId": "p6",
-    "professorName": "Ricardo Torres",
-    "email": "rtorres@uninorte.edu.co",
-    "department": "Ingeniería de Sistemas"
+    "professorName": "Ivan Yesid Gomez Gomez",
+    "email": "ivangomez@uninorte.edu.co",
+    "department": "Matematicas"
   },
   {
     "professorId": "p7",
-    "professorName": "Laura Méndez",
-    "email": "lmendez@uninorte.edu.co",
-    "department": "Matemáticas"
+    "professorName": "YESNERI MAIDER ZULETA SALDARRIAGA",
+    "email": "yesnerizuleta@uninorte.edu.co",
+    "department": "Matematicas"
   },
   {
     "professorId": "p8",
-    "professorName": "Andrés Fontalvo",
-    "email": "afontalvo@uninorte.edu.co",
-    "department": "Ingeniería"
+    "professorName": "Jorge Isaac Robinson Evilla",
+    "email": "Jorgerobinson@uninorte.edu.co",
+    "department": "Matematicas"
+  },
+  {
+    "professorId": "p9",
+    "professorName": "GERMAN ENRIQUE JIMENEZ BLANCO",
+    "email": "germanjimenez@uninorte.edu.co",
+    "department": "Matematicas"
+  },
+  {
+    "professorId": "p10",
+    "professorName": "LILIANA ISABEL GARRIDO HERNANDEZ",
+    "email": "lilieanagarrido@uninorte.edu.co",
+    "department": "Matematicas"
+  },
+  {
+    "professorId": "p11",
+    "professorName": "CARLOS JAVIER ROJAS ALVAREZ",
+    "email": "carlosrojas@uninorte.edu.co",
+    "department": "Matematicas"
+  },
+  {
+    "professorId": "p12",
+    "professorName": "Margarita Rosa Gamarra Acosta",
+    "email": "magamarra@uninorte.edu.co",
+    "department": "Ingenieria de Sistemas"
+  },
+  {
+    "professorId": "p13",
+    "professorName": "MAGRETH JHISELA TORO RODRIGUEZ",
+    "email": "Magrethtoro@uninorte.edu.co",
+    "department": "Lenguas"
+  },
+  {
+    "professorId": "p14",
+    "professorName": "ANGELICA MARIA ROJAS CHAVEZ",
+    "email": "angelicarojas@uninorte.edu.co",
+    "department": "Lenguas"
+  },
+  {
+    "professorId": "p15",
+    "professorName": "ALANA FARRAH FAYE DEL SOCORRO ROA NARVAEZ",
+    "email": "alanafayeso@uninorte.edu.co",
+    "department": "Lenguas"
   }
 ]

@@ -751,3 +751,349 @@ main > section:not(:first-child) {
 .btn-slate span:first-child {
   font-size: 1rem;
 }
+
+/* ===== Acordeones de proyección ===== */
+
+.subject-card {
+  margin-bottom: 0.75rem;
+  border-radius: 1rem;
+}
+
+.subject-header,
+.prof-header {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+}
+
+.subject-header:hover,
+.prof-header:hover {
+  background: #f9fafb;
+}
+
+.subject-header__right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.accordion-chevron {
+  font-size: 0.9rem;
+  transform: rotate(-90deg);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+  opacity: 0.6;
+}
+
+.accordion-chevron.is-open {
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+.accordion-body {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prof-block {
+  border-radius: 0.75rem;
+  padding: 0.25rem 0.4rem;
+}
+
+.prof-body {
+  padding: 0.25rem 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item--nrc {
+  padding-inline: 0.25rem;
+}
+
+/* Tooltip ya lo tienes; esto solo asegura que el shift funcione */
+.tooltip {
+  transform: translateX(var(--tip-shift, 0px));
+}
+
+/* --- Welcome Page --- */
+
+.welcome-wrap {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.form-card {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  width: 360px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.form-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 24px;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  background: white;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.btn-green {
+  width: 100%;
+  padding: 10px 0;
+  background: #15803d;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-green:hover {
+  background: #166534;
+}
+
+/* ======== Pantalla de Bienvenida ======== */
+.welcome-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 16px;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  padding: 40px 36px;
+  border-radius: 18px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+}
+
+.form-title {
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: #0f172a;
+}
+
+.field {
+  margin-bottom: 24px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-actions {
+  margin-top: 32px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-green {
+  display: inline-block;
+  padding: 12px 18px;
+  width: 100%;
+  background: #0f7b26;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.btn-green:hover {
+  background: #0d6a21;
+}
+
+/* ===== Topbar general ===== */
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.6rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar__wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ===== Brand (logo + texto) ===== */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__logo {
+  width: 42px;
+  height: 42px;
+  background-image: url("/img/logo_UNINORTE.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.brand__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ===== Buttons group ===== */
+.topbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* << aquí haces que haya espacio entre los botones */
+}
+
+/* Fix: botón "Mostrar grafo" sin subrayados ni bordes raros */
+.btn-slate {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+/* Botones verdes y slate mejorados */
+.btn-green {
+  background: #0f7a33;
+  color: white;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.13);
+  transition: 0.15s;
+}
+.btn-green:hover {
+  background: #0b5e27;
+}
+
+.btn-slate {
+  background: #f3f4f6;
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  color: #111827;
+  display: flex;
+  gap: 6px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.btn-slate:hover {
+  background: #e5e7eb;
+}
+
+/* ===== User menu ===== */
+.user-menu {
+  position: relative;
+}
+
+.user-trigger {
+  background: #f3f4f6;
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.dropdown {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px 0;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown__item {
+  padding: 0.6rem 1rem;
+  width: 100%;
+  text-align: left;
+}
+.dropdown__item:hover {
+  background: #f5f5f5;
+}
