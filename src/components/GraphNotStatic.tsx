@@ -44,7 +44,7 @@ type Props = {
   edgeInfo?: Map<string, EdgeInfo>;
   labels?: Map<string, NodeLabel>;
   emphasizeHover?: boolean;
-  performanceMode?: boolean; // ←🔥 NECESARIO
+  performanceMode?: boolean; 
 };
 
 export default function GraphNotStatic({

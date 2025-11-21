@@ -80,7 +80,7 @@ export default function GraphCard({
             labels={labels}
             edgeInfo={edgeInfo}
             emphasizeHover={emphasizeHover}
-            performanceMode={computedPerformanceMode} // ← OK
+            performanceMode={computedPerformanceMode} 
           />
         </div>
       </div>
